@@ -1,5 +1,12 @@
 import Dep from "./dep";
-import { arrayMethods } from "./array";
+import {
+  arrayMethods
+} from "./array";
+import {
+  def,
+  isObject,
+  hasOwn
+} from "./utils";
 
 const hasProtp = '__proto__' in {}
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
@@ -7,14 +14,15 @@ const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 
 // 观测一个数据、将会遍历观测对象的所有属性 或 改造数组的部分方法
 export default class Observer {
-  constructor (value) {
+  constructor(value) {
     this.value = value
     // 数组的依赖！？
     this.dep = new Dep()
+    def(value, '__ob__', this)
     if (Array.isArray(value)) {
-      const augment = hasProto
-        ? protoAugment
-        : copyAugment
+      const augment = hasProto ?
+        protoAugment :
+        copyAugment
       augment(value, arrayMethods, arrayKeys)
 
     } else {
@@ -23,7 +31,7 @@ export default class Observer {
   }
 
   // 遍历对象，进行观测，将所有属性转化为getter
-  walk (obj) {
+  walk(obj) {
     const keys = Object.keys(obj)
     for (let i = 0; i < keys.length; i++) {
       defineProperty(obj, key[i], obj[key[i]])
@@ -31,10 +39,11 @@ export default class Observer {
   }
 }
 
-function protoAugment (target, src, keys) {
+function protoAugment(target, src, keys) {
   target.__proto__ = src
 }
-function copyAugment (target, src, keys) {
+
+function copyAugment(target, src, keys) {
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i]
     def(target, key, src[key])
@@ -55,6 +64,9 @@ function defineProperty(data, key, val) {
     configurable: true,
     get() {
       dep.depend()
+      if (childOb) {
+        childOb.dep.depend()
+      }
       return val
     },
     set(newValue) {
@@ -67,12 +79,15 @@ function defineProperty(data, key, val) {
   })
 }
 
-// export function observe (value, asRootData) {
-//   if (!isObject(value)) {
-//     return
-//   }
-//   // let ob
-//   // if (hasOwn(value, '__ob__', {
-
-//   // }))
-// }
+export function observe(value, asRootData) {
+  if (!isObject(value)) {
+    return
+  }
+  let ob
+  if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
+    ob = value.__ob__
+  } else {
+    ob = new Observer(value)
+  }
+  return ob
+}

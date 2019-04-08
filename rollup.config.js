@@ -4,5 +4,8 @@ export default {
     file: 'dist/vue.js',
     format: 'umd',
     name: 'Vue'
+  },
+  watch: {
+    include: 'vue/**'
   }
 }
