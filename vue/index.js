@@ -8,7 +8,7 @@ import {
   hasOwn
 } from "./utils";
 
-const hasProtp = '__proto__' in {}
+const hasProto = '__proto__' in {}
 const arrayKeys = Object.getOwnPropertyNames(arrayMethods)
 
 
@@ -24,7 +24,7 @@ export default class Observer {
         protoAugment :
         copyAugment
       augment(value, arrayMethods, arrayKeys)
-
+      this.observeArray(value)
     } else {
       this.walk(value)
     }
@@ -34,7 +34,14 @@ export default class Observer {
   walk(obj) {
     const keys = Object.keys(obj)
     for (let i = 0; i < keys.length; i++) {
-      defineProperty(obj, key[i], obj[key[i]])
+      defineProperty(obj, keys[i], obj[keys[i]])
+    }
+  }
+
+  // 遍历观测数组的每一项
+  observeArray (items) {
+    for (let i = 0, l = items.length; i < l; i++) {
+      observe(items[i])
     }
   }
 }

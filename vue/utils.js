@@ -13,7 +13,7 @@ export function parsePath(path) {
   }
 }
 
-export function def(target, key, val, enumerable) {
+export function def(obj, key, val, enumerable) {
   Object.defineProperty(obj, key, {
     value: val,
     enumerable: !!enumerable,
@@ -35,6 +35,6 @@ export function isObject(obj) {
  * Check whether an object has the property.
  */
 const hasOwnProperty = Object.prototype.hasOwnProperty
-export function hasOwn(obj: Object | Array < * > , key: string): boolean {
+export function hasOwn(obj, key) {
   return hasOwnProperty.call(obj, key)
 }
